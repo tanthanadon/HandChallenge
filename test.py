@@ -34,6 +34,37 @@ class PlayerTests(unittest.TestCase):
     
 class GameTests(unittest.TestCase):
 
+    def test_validate_hands(self):
+        game = Game()
+        game.set_predictor(game.user)
+        left, right = game.validate_hands(list("oc"))
+
+        game.predictor.set_hands(left, right)
+        
+        self.assertEqual(game.predictor.left, "O")
+        self.assertEqual(game.predictor.right, "C")
+    
+    def test_validate_guess(self):
+        game = Game()
+        game.set_predictor(game.user)
+        guess = game.validate_guess(3)
+
+        game.predictor.shout(guess)
+
+        self.assertEqual(game.predictor.guess, 3)
+
+    def test_validate_input(self):
+        game = Game()
+        game.set_predictor(game.user)
+        left, right, guess = game.validate_input(game.user, list("oo4"))
+
+        game.predictor.set_hands(left, right)
+        game.predictor.shout(guess)
+
+        self.assertEqual(game.predictor.left, "O")
+        self.assertEqual(game.predictor.right, "O")
+        self.assertEqual(game.predictor.guess, 4)
+
     def test_set_predictor(self):
         game = Game()
         game.set_predictor(game.user)
@@ -49,7 +80,7 @@ class GameTests(unittest.TestCase):
 
     def test_count_open(self):
         game = Game()
-        game.random_predictor()
+        game.set_predictor(game.user)
 
         game.predictor.set_hands("O", "C")
         game.non_predictor.set_hands("O", "O")
@@ -58,15 +89,15 @@ class GameTests(unittest.TestCase):
 
         self.assertEqual(number_open, 3)
 
-    def test_validate(self):
+    def test_evaluate(self):
         game = Game()
-        game.random_predictor()
+        game.set_predictor(game.user)
 
         game.predictor.set_hands("O", "C")
         game.non_predictor.set_hands("O", "O")
 
         game.predictor.shout(3)
-        game.validate()
+        game.evaluate()
 
         self.assertEqual(game.ending, True)
     
